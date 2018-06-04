@@ -1,0 +1,73 @@
+.header{
+    position:absolute;
+    top:20px;
+    left:20px;
+}
+.content{
+    height: 93%;
+    background-image: url("../../res/image/timg.jpg");
+    background-size:100%;
+    background-repeat: no-repeat;
+    min-width: 1024px;
+}
+.login-box{
+    height: auto;
+    position: absolute;
+    top: 206px;
+    margin-left: 126px;
+    left: 50%;
+    /*background-color:#93D1FF;*/
+    padding: 42px;
+    border: 1px solid transparent;
+    background: rgba(0,0,0,.5);
+}
+.login-img{
+    display: inline-block;
+    border: none;
+    position: absolute;
+    z-index: 1;
+    right: -10px;
+    top: 1px;
+    width:110px;
+    height:36px;
+    align:top;
+}
+.title{
+    color:white;
+    font-size: 2em;
+    font-weight: bold;
+    display: block;
+    -webkit-margin-before: -0.33em;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    margin-left: 64px;
+}
+.lable-userName-bg{
+    background-image: url("../../res/image/tel.png");
+    background-size:20px 20px;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 6px;
+    top: 9px;
+    width: 44px;
+    height: 40px;
+    display: inline-block;
+}
+.label-ps-bg{
+    background-image: url("../../res/image/pwd.png");
+    background-size:20px 20px;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 6px;
+    top: 9px;
+    width: 44px;
+    height: 40px;
+    display: inline-block;
+}
+.layui-input{
+    padding-left:33px;
+}
+h1{
+    font-size:2em;
+}

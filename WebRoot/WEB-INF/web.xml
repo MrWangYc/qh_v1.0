@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+    <!-- 配置需要初始化的xml文件,不配置时默认加载applicatinContext.xml -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/classes/applicationContext.xml</param-value>
+    </context-param>
+
+    <!-- 配置字符集拦截器，由spring提供 -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>openSession</filter-name>
+        <filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
+        <init-param>
+            <param-name>flushMode</param-name>
+            <param-value>AUTO</param-value>
+        </init-param>
+        <init-param>
+            <param-name>singleSession</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+    </filter>
+    <filter-mapping>
+        <filter-name>openSession</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- 配置字自定义http拦截器 -->
+    <filter>
+        <filter-name>httpFilter</filter-name>
+        <filter-class>com.util.filter.HttpFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>httpFilter</filter-name>
+        <url-pattern>*.action</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>httpFilter</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>httpFilter</filter-name>
+        <url-pattern>*.jspx</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>struts2</filter-name>
+        <filter-class>
+            org.apache.struts2.dispatcher.filter.StrutsPrepareAndExecuteFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>struts2</filter-name>
+        <url-pattern>*.action</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>struts2</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+    </listener>
+    <!-- 配置spring的监听器，默认加载WEB-INF/applicationContext.xml,通过上面的contex-param标签配置之后，加载context-param中的子标签param-value指定的xml文件 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>com.util.listener.ServletListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.util.listener.SessionListener</listener-class>
+    </listener>
+
+
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/jsp/404.html</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/jsp/500.jsp</location>
+    </error-page>
+</web-app>

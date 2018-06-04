@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <context:annotation-config/>
+    <!-- 设置需要进行Spring注解扫描的类包 -->
+    <context:component-scan base-package="com"/>
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+
+    <!-- 定义数据源的信息 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>
+        <property name="minPoolSize" value="${jdbc.minPoolSize}"/>
+        <property name="initialPoolSize" value="${jdbc.initialPoolSize}"/>
+        <property name="testConnectionOnCheckin" value="${jdbc.testConnectionOnCheckin}"/>
+        <property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}"/>
+        <property name="testConnectionOnCheckout" value="${jdbc.testConnectionOnCheckout}"/>
+        <property name="maxIdleTime" value="${jdbc.maxIdleTime}"/>
+        <!--
+            最大空闲时间,指定秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0
+        -->
+        <property name="acquireIncrement" value="${jdbc.acquireIncrement}"/>
+    </bean>
+
+    <!--定义Hibernate的SessionFactory -->
+    <!-- SessionFactory使用的数据源为上面的数据源 -->
+    <!-- 指定了Hibernate的映射文件和配置信息 -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource">
+            <ref local="dataSource" />
+        </property>
+        <property name="hibernateProperties">
+            <value>
+                <!-- 设置数据库方言 -->
+                hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+                <!-- 输出SQL语句到控制台 -->
+                hibernate.show_sql=true
+                <!-- 格式化输出到控制台的SQL语句 -->
+                hibernate.format_sql=false
+                <!-- 是否开启二级缓存 -->
+                hibernate.cache.use_second_level_cache=false
+                <!-- 配置二级缓存产品 -->
+                hibernate.cache.provider_class=org.hibernate.cache.OSCacheProvider
+                <!-- 是否开启查询缓存 -->
+                hibernate.cache.use_query_cache=false
+                <!-- 数据库批量查询数 -->
+                hibernate.jdbc.fetch_size=100
+                <!-- 数据库批量更新数 -->
+                hibernate.jdbc.batch_size=30
+                <!--如果开启，hibernate将在SQL中生成有助于调式的注解信息。默认为false取值true|false -->
+                hibernate.use_sql_comments=true
+                <!-- 自动更新数据库 -->
+                hibernate.hbm2ddl.auto=update
+            </value>
+        </property>
+        <property name="packagesToScan">
+            <list>
+                <value>com.qh.model</value>
+            </list>
+        </property>
+    </bean>
+
+
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" scope="prototype">
+        <property name="dataSource">
+            <ref local="dataSource"/>
+        </property>
+    </bean>
+    <!--配置事务  -->
+    <!--配置Hibernate的局部事务管理器，使用HibernateTransactionManager类  -->
+    <!--该类实现PlatformTransactionManager 接口，是针对Hibernate的特定实现  -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate" scope="prototype">
+        <property name="sessionFactory">
+            <ref local="sessionFactory"/>
+        </property>
+    </bean>
+    <!-- 使用AspectJ方式配置AOP -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <aop:config proxy-target-class="true"/>
+    <!-- 配置事务传播特性 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="del*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="excute*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 配置哪些类的哪些方法参与事务 -->
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="interceptorPointCutsService" expression="execution(* com.qh.service..*.*(..))"/>
+        <aop:pointcut id="interceptorPointCutsDao" expression="execution(* com.qh.dao..*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCutsService"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCutsDao"/>
+    </aop:config>
+
+</beans>

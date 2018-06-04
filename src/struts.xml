@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+
+    <include file="struts-default.xml"></include>
+    <!-- 指定默认编码集 -->
+    <constant name="struts.i18n.encoding" value="UTF-8"></constant>
+    <!-- 指定需要Struts2处理的请求后缀 -->
+    <constant name="struts.convention.action.suffix" value="Action"></constant>
+    <!-- 设置浏览器是否缓存静态内容，开发阶段应关闭，生产阶段打开，默认为打开 -->
+    <constant name="struts.serve.static.browserCache" value="false"></constant>
+    <!-- 当struts的配置文件修改后，系统是否自动重新加载该文件，默认为false，开发阶段应打开 -->
+    <constant name="struts.configuration.xml.reload" value="true"></constant>
+    <!-- 开发模式下使用，可以打印出更详细的错误信息 -->
+    <constant name="struts.devMode" value="false"></constant>
+    <!-- 配置使用Spring管理Action -->
+    <constant name="struts.objectFactory" value="spring" />
+    <!-- 名称首字母小写 -->
+    <constant name="struts.convention.action.name.lowercase" value="true"/>
+
+    <constant name="struts.convention.package.locators" value="action" />
+    <constant name="struts.convention.action.name.separator" value="-" />
+    <!-- 需要扫描的包 -->
+    <constant name="struts.convention.package.locators.basePackage" value="com.qh.action" />
+    <!-- 为true可使用感叹号调用方法，官网不推荐 -->
+    <constant name="struts.enable.DynamicMethodInvocation" value="true" />
+    <constant name="struts.convention.action.mapAllMatches" value="true" />
+
+    <!-- 结果资源的路径 -->
+    <constant name="struts.convention.result.path" value="/WEB-INF/jsp/" />
+    <package name="defPackage" extends="struts-default" namespace="/" strict-method-invocation="false">
+        <interceptors>
+            <interceptor-stack name="baseStack">
+                <interceptor-ref name="defaultStack" />
+                <interceptor-ref name="fileUpload" >
+                    <!-- 配置允许上传的文件类型 -->
+                    <param name="allowedTypes">image/bmp,image/png,image/gif,image/jpeg,image/jpg</param>
+                    <!-- 配置允许上传的文件大小 单位字节-->
+                    <param name="maximumSize">20971520</param>
+                </interceptor-ref>
+                <interceptor-ref name="params">
+                    <param name="excludeParams">^class\..*,^dojo\..*,^struts\..*,^session\..*,^request\..*,^application\..*,^servlet(Request|Response)\..*,^parameters\..*,^action:.*,^method:.*</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+        <!-- 配置默认拦截器栈 -->
+        <default-interceptor-ref name="baseStack" />
+        <global-results>
+            <result name="error" type="dispatcher">/error.jsp</result>
+            <result name="message" type="dispatcher">/html/message.jsp</result>
+            <result name="logout" type="redirect">/index.jsp</result>
+            <result name="templatePrint" type="dispatcher">/WEB-INF/jsp/util/print-templatePrint.jsp</result>
+        </global-results>
+        <global-allowed-methods>regex:.*</global-allowed-methods>
+    </package>
+</struts>
